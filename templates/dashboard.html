@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QuickFind - Product Dashboard</title>
+    <style>
+        :root {
+            --primary-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --accent-gradient: linear-gradient(135deg, #00b894 0%, #00a085 100%);
+            --danger-gradient: linear-gradient(135deg, #fd79a8 0%, #e84393 100%);
+            --success-gradient: linear-gradient(135deg, #55efc4 0%, #00b894 100%);
+            --warning-gradient: linear-gradient(135deg, #fdcb6e 0%, #e17055 100%);
+            --whatsapp-color: #25D366;
+            --border-color: rgba(102,126,234,0.12);
+            --shadow-light: 0 4px 20px rgba(102,126,234,0.08);
+            --shadow-medium: 0 8px 32px rgba(102,126,234,0.12);
+            --shadow-heavy: 0 16px 48px rgba(102,126,234,0.18);
+            --radius-xl: 24px;
+            --radius-lg: 16px;
+            --radius-md: 12px;
+            --radius-sm: 8px;
+        }
+        
+        * {margin:0; padding:0; box-sizing:border-box;}
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            color: #2c3e50;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        /* Animated background particles */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="1" fill="rgba(102,126,234,0.05)"/></svg>') repeat;
+            animation: float 25s infinite linear;
+            pointer-events: none;
+            z-index: -1;
+        }
+        
+        @keyframes float {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+        
+        .header {
+            background: var(--primary-gradient);
+            padding: 0;
+            box-shadow: var(--shadow-heavy);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: headerGlow 8s ease-in-out infinite;
+        }
+        
+        @keyframes headerGlow {
+            0%, 100% { transform: scale(1) rotate(0deg); }
+            50% { transform: scale(1.1) rotate(180deg); }
+        }
+        
+        .nav {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 24px 32px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .logo {
+            font-size: 36px;
+            font-weight: 900;
+            color: #fff;
+            letter-spacing: -2px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            position: relative;
+        }
+        
+        .logo::after {
+            content: '✨';
+            position: absolute;
+            right: -40px;
+            top: -8px;
+            font-size: 20px;
+            animation: sparkle 2s ease-in-out infinite;
+        }
+        
+        @keyframes sparkle {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.7; }
+            50% { transform: scale(1.2) rotate(180deg); opacity: 1; }
+        }
+        
+        .nav-menu {
+            display: flex;
+            gap: 12px;
+            background: rgba(255,255,255,0.1);
+            padding: 8px;
+            border-radius: var(--radius-xl);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255,255,255,0.2);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .category-tab {
+            background: transparent;
+            color: rgba(255,255,255,0.8);
+            border: none;
+            padding: 12px 24px;
+            border-radius: var(--radius-lg);
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .category-tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0.1) 100%);
+            transform: translateX(-100%);
+            transition: transform 0.3s ease;
+        }
+        
+        .category-tab:hover::before {
+            transform: translateX(0);
+        }
+        
+        .category-tab.active {
+            background: rgba(255,255,255,0.95);
+            color: #667eea;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+        
+        .nav-link {
+            background: rgba(255,255,255,0.15);
+            color: white;
+            text-decoration: none;
+            padding: 12px 20px;
+            border-radius: var(--radius-xl);
+            font-size: 14px;
+            font-weight: 700;
+            transition: all 0.3s ease;
+            border: 2px solid rgba(255,255,255,0.2);
+            backdrop-filter: blur(10px);
+            white-space: nowrap;
+        }
+        
+        .nav-link:hover {
+            background: rgba(255,255,255,0.25);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.15);
+        }
+        
+        .nav-link.whatsapp {
+            background: var(--whatsapp-color);
+            border-color: var(--whatsapp-color);
+        }
+        
+        .nav-link.whatsapp:hover {
+            background: #20BA5A;
+            box-shadow: 0 8px 24px rgba(37, 211, 102, 0.4);
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 40px 32px;
+        }
+        
+        .hero-section {
+            text-align: center;
+            margin-bottom: 60px;
+        }
+        
+        .section-title {
+            font-size: 3.5rem;
+            font-weight: 900;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+            line-height: 1.2;
+            position: relative;
+        }
+        
+        .section-subtitle {
+            font-size: 1.2rem;
+            color: #7f8c8d;
+            font-weight: 500;
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .trust-indicators {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+        
+        .trust-item {
+            background: rgba(255,255,255,0.8);
+            padding: 24px;
+            border-radius: var(--radius-lg);
+            text-align: center;
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            transition: all 0.3s ease;
+        }
+        
+        .trust-item:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-medium);
+            background: rgba(255,255,255,0.95);
+        }
+        
+        .trust-icon {
+            font-size: 40px;
+            margin-bottom: 12px;
+            display: block;
+            animation: bounce 2s ease-in-out infinite;
+        }
+        
+        @keyframes bounce {
+            0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+            40% { transform: translateY(-8px); }
+            60% { transform: translateY(-4px); }
+        }
+        
+        .trust-text {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+        
+        /* Important Notices Section */
+        .notices-section {
+            margin-bottom: 40px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+        
+        .notice {
+            background: rgba(255,255,255,0.9);
+            border-radius: var(--radius-lg);
+            padding: 20px 24px;
+            box-shadow: var(--shadow-light);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.5);
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .notice-affiliate {
+            border-left: 4px solid #e17055;
+        }
+        
+        .notice-links {
+            border-left: 4px solid #74b9ff;
+        }
+        
+        .notice-help {
+            border-left: 4px solid var(--whatsapp-color);
+        }
+        
+        .notice-icon {
+            font-size: 20px;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        
+        .notice-text {
+            font-size: 14px;
+            color: #5f6f7d;
+            line-height: 1.5;
+            margin: 0;
+        }
+        
+        .notice-text a {
+            color: inherit;
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        
+        .notice-text a.whatsapp {
+            color: var(--whatsapp-color);
+        }
+        
+        .products-section {
+            position: relative;
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 32px;
+            margin-top: 40px;
+        }
+        
+        .product-card {
+            background: rgba(255,255,255,0.95);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-light);
+            border: 1px solid var(--border-color);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+        
+        .product-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--primary-gradient);
+            transform: scaleX(0);
+            transition: transform 0.3s ease;
+        }
+        
+        .product-card:hover::before {
+            transform: scaleX(1);
+        }
+        
+        .product-card:hover {
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: var(--shadow-heavy);
+            border-color: rgba(102,126,234,0.3);
+        }
+        
+        .product-image {
+            width: 100%;
+            height: 280px;
+            object-fit: cover;
+            transition: all 0.4s ease;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+        
+        .product-card:hover .product-image {
+            transform: scale(1.1);
+            filter: brightness(1.1) saturate(1.2);
+        }
+        
+        .card-content {
+            padding: 32px;
+            position: relative;
+        }
+        
+        .product-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        
+        .product-price {
+            font-size: 28px;
+            font-weight: 900;
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 16px;
+            position: relative;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .product-price::before {
+            content: '💎';
+            font-size: 24px;
+            animation: pulse 2s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        .product-description {
+            font-size: 15px;
+            color: #64748b;
+            margin-bottom: 24px;
+            line-height: 1.6;
+        }
+        
+        .product-actions {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .btn {
+            flex: 1;
+            text-align: center;
+            text-decoration: none;
+            padding: 16px 24px;
+            border-radius: var(--radius-md);
+            font-size: 15px;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            transition: left 0.6s ease;
+        }
+        
+        .btn:hover::before {
+            left: 100%;
+        }
+        
+        .btn-primary {
+            background: var(--primary-gradient);
+            color: white;
+            box-shadow: 0 4px 16px rgba(102,126,234,0.3);
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(102,126,234,0.4);
+        }
+        
+        .btn-secondary {
+            background: var(--danger-gradient);
+            color: white;
+            box-shadow: 0 4px 16px rgba(253,121,168,0.3);
+        }
+        
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 32px rgba(253,121,168,0.4);
+        }
+        
+        .footer {
+            background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+            color: white;
+            text-align: center;
+            padding: 60px 0;
+            margin-top: 100px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 6px;
+            background: var(--primary-gradient);
+        }
+        
+        .footer-text {
+            font-size: 16px;
+            font-weight: 500;
+            opacity: 0.9;
+            margin-bottom: 16px;
+        }
+        
+        .footer-helpline {
+            font-size: 14px;
+            opacity: 0.8;
+        }
+        
+        .footer-helpline a {
+            color: var(--whatsapp-color);
+            font-weight: 600;
+            text-decoration: underline;
+        }
+        
+        .footer-helpline a:hover {
+            color: #20BA5A;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 80px 32px;
+            background: rgba(255,255,255,0.9);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-medium);
+            backdrop-filter: blur(10px);
+        }
+        
+        .empty-state h3 {
+            font-size: 2rem;
+            margin-bottom: 16px;
+            background: var(--primary-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .empty-state p {
+            color: #7f8c8d;
+            font-size: 18px;
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 1024px) {
+            .nav-menu { display: none; }
+            .section-title { font-size: 2.5rem; }
+            .products-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+            .nav-links { flex-direction: column; gap: 8px; }
+        }
+        
+        @media (max-width: 768px) {
+            .container { padding: 20px 16px; }
+            .section-title { font-size: 2rem; }
+            .product-card { margin: 0 8px; }
+            .trust-indicators { grid-template-columns: repeat(2, 1fr); gap: 16px; }
+            .notices-section { margin: 20px 0; }
+            .nav { flex-direction: column; gap: 16px; }
+        }
+        
+        @media (max-width: 480px) {
+            .logo { font-size: 28px; }
+            .section-title { font-size: 1.8rem; }
+            .products-grid { grid-template-columns: 1fr; gap: 20px; }
+            .trust-indicators { grid-template-columns: 1fr; }
+            .nav-links { width: 100%; justify-content: center; }
+        }
+    </style>
+    
+    <script>
+        function filterCategory(cat) {
+            let cards = document.querySelectorAll('.product-card');
+            let visibleCount = 0;
+            
+            cards.forEach((card, index) => {
+                if (cat === 'All') {
+                    card.style.display = '';
+                    card.style.animationDelay = (index * 0.1) + 's';
+                    card.classList.add('fade-in');
+                    visibleCount++;
+                } else if (card.dataset.category === cat) {
+                    card.style.display = '';
+                    card.style.animationDelay = (visibleCount * 0.1) + 's';
+                    card.classList.add('fade-in');
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                    card.classList.remove('fade-in');
+                }
+            });
+            
+            let tabs = document.querySelectorAll('.category-tab');
+            tabs.forEach(tab => tab.classList.remove('active'));
+            document.getElementById('tab-' + cat).classList.add('active');
+        }
+        
+        // Add fade-in animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeInUp {
+                from { opacity: 0; transform: translateY(30px); }
+                to { opacity: 1; transform: translateY(0); }
+            }
+            .fade-in {
+                animation: fadeInUp 0.6s ease forwards;
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</head>
+<body>
+    <header class="header">
+        <nav class="nav">
+            <div class="logo">QuickFind</div>
+            <div class="nav-menu">
+                <button class="category-tab active" id="tab-All" onclick="filterCategory('All')">All Products</button>
+                <button class="category-tab" id="tab-Watches" onclick="filterCategory('Watches')">⌚ Watches</button>
+                <button class="category-tab" id="tab-Earbuds" onclick="filterCategory('Earbuds')">🎧 Earbuds</button>
+                <button class="category-tab" id="tab-Mobiles" onclick="filterCategory('Mobiles')">📱 Mobiles</button>
+                <button class="category-tab" id="tab-NonElectronics" onclick="filterCategory('NonElectronics')">🏠 Others</button>
+            </div>
+            <div class="nav-links">
+                <a href="{{ url_for('login') }}" class="nav-link">🔐 Admin Panel</a>
+                <a href="https://whatsapp.com/channel/0029VaAsOxbHVvTYZiTDxI1W" class="nav-link whatsapp" target="_blank">📱 WhatsApp Helpline</a>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="hero-section">
+            <h1 class="section-title">Discover Amazing Products</h1>
+            <p class="section-subtitle">Handpicked quality items at unbeatable prices. Your satisfaction is our priority.</p>
+            
+            <div class="trust-indicators">
+                <div class="trust-item">
+                    <span class="trust-icon">🔒</span>
+                    <div class="trust-text">Secure Shopping</div>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-icon">⚡</span>
+                    <div class="trust-text">Lightning Fast</div>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-icon">🏆</span>
+                    <div class="trust-text">Premium Quality</div>
+                </div>
+                <div class="trust-item">
+                    <span class="trust-icon">💯</span>
+                    <div class="trust-text">100% Genuine</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Important Notices Section -->
+        <div class="notices-section">
+            <div class="notice notice-affiliate">
+                <span class="notice-icon">ℹ️</span>
+                <p class="notice-text">
+                    <strong>Affiliate Disclosure:</strong> Some links are affiliate links. We may earn a commission at no extra cost to you.
+                </p>
+            </div>
+            <div class="notice notice-links">
+                <span class="notice-icon">🔗</span>
+                <p class="notice-text">
+                    <strong>Link Notice:</strong> Some links might expire or have price differences. Expired links will be taken down within 4-5 working days.
+                </p>
+            </div>
+            <div class="notice notice-help">
+                <span class="notice-icon">📱</span>
+                <p class="notice-text">
+                    <strong>Need Help?</strong> <a href="https://whatsapp.com/channel/0029VaAsOxbHVvTYZiTDxI1W" class="whatsapp" target="_blank">Chat with us on WhatsApp</a> for any queries or support.
+                </p>
+            </div>
+        </div>
+        
+        <div class="products-section">
+            {% if products %}
+            <div class="products-grid">
+                {% for p in products %}
+                <div 
+                    class="product-card fade-in"
+                    data-category="{{ 
+                        'Watches' if (p.category|lower in ['smartwatch','watch','watches'] or 
+                                      'watch' in p.name|lower or 'smartwatch' in p.name|lower) else 
+                        'Earbuds' if (p.category|lower in ['earbuds','tws'] or 
+                                      'earbuds' in p.name|lower or 'airdopes' in p.name|lower) else
+                        'Mobiles' if (p.category|lower in ['mobiles','mobile','phone','phones'] or 
+                                      'phone' in p.name|lower or 'mobile' in p.name|lower) else
+                        'NonElectronics'
+                    }}"
+                    style="animation-delay: {{ loop.index0 * 0.1 }}s;"
+                >
+                    <img src="{{ p.image }}" alt="{{ p.name }}" class="product-image"
+                         onerror="this.src='https://via.placeholder.com/350x280/667eea/ffffff?text=Product+Image'">
+                    <div class="card-content">
+                        <h3 class="product-title">{{ p.name }}</h3>
+                        <div class="product-price">₹{{ "{:,}".format(p.price) }}</div>
+                        {% if p.description %}
+                        <p class="product-description">{{ p.description }}</p>
+                        {% endif %}
+                        <div class="product-actions">
+                            {% if p.amazon %}
+                            <a href="{{ p.amazon }}" target="_blank" class="btn btn-primary">🛒 Buy on Amazon</a>
+                            {% endif %}
+                            {% if p.meesho and "YOUR_MEESHO_AFFILIATE_LINK" not in p.meesho %}
+                            <a href="{{ p.meesho }}" target="_blank" class="btn btn-secondary">🛍️ Buy on Meesho</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% else %}
+            <div class="empty-state">
+                <h3>🚀 Amazing Products Coming Soon!</h3>
+                <p>We're carefully selecting the best products just for you. Stay tuned!</p>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <footer class="footer">
+        <div class="footer-text">
+            © 2025 Handy Now. Your trusted product discovery platform. ✨
+        </div>
+        <div class="footer-helpline">
+            Helpline: <a href="https://whatsapp.com/channel/0029VaAsOxbHVvTYZiTDxI1W" target="_blank">WhatsApp Channel</a>
+        </div>
+    </footer>
+
+    <script>
+        // Initialize page
+        window.onload = function() {
+            filterCategory('All');
+        };
+        
+        // Add scroll animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+        
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('fade-in');
+                }
+            });
+        }, observerOptions);
+        
+        document.querySelectorAll('.product-card').forEach(card => {
+            observer.observe(card);
+        });
+    </script>
+</body>
+</html>
