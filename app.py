@@ -1,27 +1,44 @@
+import os
 from flask import Flask, render_template, request, redirect, url_for, flash
 from flask_pymongo import PyMongo
-from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
+from flask_login import (
+    LoginManager,
+    UserMixin,
+    login_user,
+    login_required,
+    logout_user,
+    current_user,
+)
 from bson.objectid import ObjectId
 
+# Initialize Flask app
 app = Flask(__name__)
-import os
+
+# Load configs from environment variables
 app.secret_key = os.environ.get("SECRET_KEY", "default_secret")
 app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 
+# Initialize MongoDB
 mongo = PyMongo(app)
 
+# Setup Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
-login_manager.login_view = 'login'
+login_manager.login_view = "login"
 
+
+# User class for Flask-Login
 class User(UserMixin):
     def __init__(self, id):
         self.id = id
 
+
+# Temporary hardcoded admin (replace with DB users later)
 ADMIN_USER = {
     "id": "admin",
-    "password": "adminpassword"  # Change as needed
+    "password": "adminpassword",  # change this!
 }
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -29,58 +46,63 @@ def load_user(user_id):
         return User(user_id)
     return None
 
-@app.route('/')
+
+@app.route("/")
 def dashboard():
     products = list(mongo.db.products.find())
-    return render_template('dashboard.html', products=products)
+    return render_template("dashboard.html", products=products)
 
-@app.route('/login', methods=['GET', 'POST'])
+
+@app.route("/login", methods=["GET", "POST"])
 def login():
-    if request.method == 'POST':
-        userid = request.form.get('username')
-        pw = request.form.get('password')
-        if userid == ADMIN_USER['id'] and pw == ADMIN_USER['password']:
+    if request.method == "POST":
+        userid = request.form.get("username")
+        pw = request.form.get("password")
+        if userid == ADMIN_USER["id"] and pw == ADMIN_USER["password"]:
             user = User(userid)
             login_user(user)
-            return redirect(url_for('add_product'))
+            return redirect(url_for("add_product"))
         else:
             flash("Invalid credentials", "danger")
-    return render_template('login.html')
+    return render_template("login.html")
 
-@app.route('/add_product', methods=['GET', 'POST'])
+
+@app.route("/add_product", methods=["GET", "POST"])
 @login_required
 def add_product():
     products = list(mongo.db.products.find())
-    if request.method == 'POST':
+    if request.method == "POST":
         data = {
-            "name": request.form['name'],
-            "category": request.form['category'],
-            "description": request.form['description'],
-            "image": request.form['image'],
-            "price": int(request.form['price']),
-            "trendingScore": int(request.form['trendingScore']),
-            "amazon": request.form['amazon'],
-            "meesho": request.form['meesho']
+            "name": request.form["name"],
+            "category": request.form["category"],
+            "description": request.form["description"],
+            "image": request.form["image"],
+            "price": int(request.form["price"]),
+            "trendingScore": int(request.form["trendingScore"]),
+            "amazon": request.form["amazon"],
+            "meesho": request.form["meesho"],
         }
         mongo.db.products.insert_one(data)
         flash("Product added successfully!", "success")
-        return redirect(url_for('add_product'))
-    return render_template('add_product.html', products=products)
+        return redirect(url_for("add_product"))
+    return render_template("add_product.html", products=products)
 
-@app.route('/delete_product/<product_id>', methods=['POST'])
+
+@app.route("/delete_product/<product_id>", methods=["POST"])
 @login_required
 def delete_product(product_id):
-    mongo.db.products.delete_one({'_id': ObjectId(product_id)})
+    mongo.db.products.delete_one({"_id": ObjectId(product_id)})
     flash("Product deleted!", "info")
-    return redirect(url_for('add_product'))
+    return redirect(url_for("add_product"))
 
-@app.route('/logout')
+
+@app.route("/logout")
 @login_required
 def logout():
     logout_user()
-    return redirect(url_for('dashboard'))
-
-if __name__ == '__main__':
-    app.run(debug=True)
+    return redirect(url_for("dashboard"))
 
 
+# Render will use gunicorn (do not use app.run here)
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=5000, debug=True)
