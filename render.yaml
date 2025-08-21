@@ -1,0 +1,11 @@
+services:
+  - type: web
+    name: flask-mongo-app
+    env: python
+    buildCommand: "pip install -r requirements.txt"
+    startCommand: "gunicorn app:app"
+    envVars:
+      - key: MONGO_URI
+        value: "mongodb+srv://yapoc83028:upa56gIIOMM7mkGG@handynow.nktnutb.mongodb.net/handynow?retryWrites=true&w=majority"
+      - key: SECRET_KEY
+        value: "your_secret_key"
