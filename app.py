@@ -3,7 +3,8 @@ from flask_pymongo import PyMongo
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from bson.objectid import ObjectId
 
-app = Flask(__name__)import os
+app = Flask(__name__)
+import os
 app.secret_key = os.environ.get("SECRET_KEY", "default_secret")
 app.config["MONGO_URI"] = os.environ.get("MONGO_URI")
 
@@ -81,4 +82,5 @@ def logout():
 
 if __name__ == '__main__':
     app.run(debug=True)
+
 
